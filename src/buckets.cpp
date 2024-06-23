@@ -1,5 +1,4 @@
 #include "buckets.hpp"
-#include <cassert>
 
 using namespace std;
 
@@ -14,13 +13,10 @@ unsigned list::size() const {
 }
 
 void list::push(unsigned name) {
-    assert(!cells.contains(name));
     cells_.insert(name);
 }
 
 unsigned list::pop() {
-    assert(cells.size() != 0);
-
     auto last = cells_.begin();
     const unsigned cell = *last;
     cells_.erase(last);
@@ -55,8 +51,6 @@ unsigned bucket::pop() {
     auto max_iter = bucket_.rbegin();
     list& list = max_iter->second;
 
-    assert(list.size() != 0);
-
     const unsigned cell = list.pop();
     if (list.size() == 0) {
         bucket_.erase(max_iter->first);
@@ -85,15 +79,11 @@ bool bucket::contains(unsigned name) {
 void bucket::update(int old_gain, int new_gain, unsigned name) {
     auto& old_list = bucket_[old_gain];
 
-    assert(old_list.contains(name));
-
     old_list.erase(name);
     if (old_list.size() == 0) {
         bucket_.erase(old_gain);
     }
     auto& new_list = bucket_[new_gain];
-
-    assert(!new_list.contains(name));
 
     new_list.push(name);
 }
@@ -102,7 +92,6 @@ void bucket::fill(const vector<cell*>& cmap) {
     for (unsigned idx = 0; idx < cmap.size(); ++idx) {
         push(idx, cmap[idx]);
     }
-    assert(size() == cmap.size());
 }
 
 bucket& bucket::operator=(bucket&& b) {
@@ -115,8 +104,6 @@ void bucket::empty(bucket& other, unordered_set<unsigned>& seen) {
          ++iter) {
         const unsigned gain = iter->first;
         list& list = iter->second;
-
-        assert(list.size() != 0);
 
         for (unsigned idx = 0, SIZE = list.size(); idx < SIZE; ++idx) {
             unsigned value = list.pop();

@@ -1,11 +1,13 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
 #include "buckets.hpp"
 #include "cells.hpp"
+#include "init.hpp"
 #include "nets.hpp"
 
 class floor_plan {
@@ -30,10 +32,11 @@ class floor_plan {
 
     double balance() const;
 
-    template <bool soph>
     void init_side();
 
     void tolerate(unsigned amount);
+
+    void sort_net_list();
 
    private:
     std::vector<net*> net_map_;
@@ -41,19 +44,14 @@ class floor_plan {
     std::vector<std::string> net_names_;
     std::vector<std::string> cell_names_;
     bucket bucket_;
+    std::unique_ptr<init_strategy> init_;
     double balance_;
     unsigned total_count_;
     unsigned tolerate_;
 
-    unsigned naiv_init_side();
-    unsigned soph_init_side();
-
     void init_gains();
-    void check_gains();
-    void init_bucket();
 
-    template <bool check>
-    void cal_gains();
+    void init_bucket();
 
     int fm_once(std::function<bool(const unsigned)> condition);
 
@@ -61,12 +59,3 @@ class floor_plan {
              const std::unordered_set<unsigned>& seen,
              unsigned cname);
 };
-
-template <bool soph>
-void floor_plan::init_side() {
-    if (soph) {
-        total_count_ = soph_init_side();
-    } else {
-        total_count_ = naiv_init_side();
-    }
-}

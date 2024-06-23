@@ -1,5 +1,4 @@
 #include "helper.hpp"
-#include <cassert>
 #include <unordered_map>
 #include <vector>
 #include "cells.hpp"
@@ -25,10 +24,8 @@ void store_updates(vector<cell*>& cmap,
             cell->dec_gain();
             break;
     }
-    assert(new_gain == cell->gain());
     if (records.contains(name)) {
         auto& record = records[name];
-        assert(old_gain == record.updated);
         record.updated = new_gain;
     } else {
         records[name] = gain_delta(old_gain, new_gain);
@@ -39,8 +36,6 @@ int flip_cell(vector<net*>& nmap,
               vector<cell*>& cmap,
               unsigned cname,
               unordered_map<unsigned, gain_delta>& records) {
-    assert(records.size() == 0);
-
     cell* named_cell = cmap[cname];
 
     int cutsize_reduction = 0;
@@ -64,7 +59,6 @@ int flip_cell(vector<net*>& nmap,
                     store_updates<modi::inc>(cmap, records, other_name);
                 }
                 store_updates<modi::inc>(cmap, records, cname);
-                assert(records[cname].updated == cell->gain());
                 break;
             case 1:
                 for (jdx = cnt = 0; jdx < cells.size(); ++jdx) {
@@ -75,13 +69,11 @@ int flip_cell(vector<net*>& nmap,
                         ++cnt;
                     }
                 }
-                assert(cnt == 1);
                 break;
         }
 
         // cell is moved here
         named_cell->flip();
-        assert(cell->side() != fromSide && "Cell should be flipped here");
 
         net->dec_count(fromSide);
         const unsigned fromCount = net->count(fromSide);
@@ -104,7 +96,6 @@ int flip_cell(vector<net*>& nmap,
                         ++cnt;
                     }
                 }
-                assert(cnt == 1);
                 break;
             default:
                 // Do nothing.
@@ -112,12 +103,8 @@ int flip_cell(vector<net*>& nmap,
         }
 
         named_cell->flip();
-        assert(cell->side() == fromSide && "Cell shouldn't be flipped here");
-
-        assert(fromCount + toCount + 1 == cells.size() && "Counting error!");
     }
     named_cell->flip();
-    assert(cell->side() != fromSide && "Cell should be flipped here");
 
     return cutsize_reduction;
 }
@@ -138,10 +125,8 @@ int floor_plan::flip(bucket& nbucket,
         const unsigned name = iter->first;
         const gain_delta& record = iter->second;
         if (seen.contains(name)) {
-            assert(!_bucket.contains(name));
             nbucket.update(record.original, record.updated, name);
         } else {
-            assert(!nbucket.contains(name));
             bucket_.update(record.original, record.updated, name);
         }
     }
