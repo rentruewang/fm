@@ -95,7 +95,7 @@ void bucket::fill(const vector<cell*>& cmap) {
 }
 
 bucket& bucket::operator=(bucket&& b) {
-    bucket_ = move(b.bucket_);
+    bucket_ = std::move(b.bucket_);
     return *this;
 }
 

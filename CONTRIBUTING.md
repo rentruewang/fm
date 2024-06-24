@@ -10,4 +10,5 @@
 6. Except when ambiguous, then use `()` normal initialization.
 7. Never omit braces after `if` / `else` / `while` / `for`.
 8. Except for side effects (empty body). In which case put a `;` as the body.
-9. Follow [CppCoreGuidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).
+9. Use `///` for documentation strings.
+10. Follow [CppCoreGuidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines).

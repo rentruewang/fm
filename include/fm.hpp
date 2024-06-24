@@ -1,14 +1,14 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
 #include "buckets.hpp"
 #include "cells.hpp"
-#include "init.hpp"
 #include "nets.hpp"
+
+class init_strategy;
 
 class floor_plan {
    public:
@@ -27,16 +27,15 @@ class floor_plan {
     std::vector<cell*>& cmap();
     const std::vector<cell*>& cmap() const;
 
-    void input(const std::string fname);
-    void output(const std::string name);
-
     double balance() const;
 
-    void init_side();
-
-    void tolerate(unsigned amount);
-
+    void init_side(const init_strategy& init);
     void sort_net_list();
+    unsigned tolerate() const;
+
+    floor_plan& operator<<(std::string fname);
+    floor_plan& operator<<(unsigned tolerate);
+    floor_plan& operator>>(std::string fname);
 
    private:
     std::vector<net*> net_map_;
@@ -44,10 +43,13 @@ class floor_plan {
     std::vector<std::string> net_names_;
     std::vector<std::string> cell_names_;
     bucket bucket_;
-    std::unique_ptr<init_strategy> init_;
+
     double balance_;
     unsigned total_count_;
     unsigned tolerate_;
+
+    void input(std::string fname);
+    void output(std::string name);
 
     void init_gains();
 

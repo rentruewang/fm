@@ -1,15 +1,33 @@
 #include <fstream>
 #include <iostream>
+#include <istream>
+#include <ostream>
 #include <sstream>
+#include <string_view>
 #include <unordered_set>
 #include "fm.hpp"
 
 using namespace std;
 
-void floor_plan::input(const string fname) {
+floor_plan& floor_plan::operator<<(string fname) {
+    input(fname);
+    return *this;
+}
+
+floor_plan& floor_plan::operator<<(unsigned tolerate) {
+    tolerate_ = tolerate;
+    return *this;
+}
+
+floor_plan& floor_plan::operator>>(string fname) {
+    output(fname);
+    return *this;
+}
+
+void floor_plan::input(string fname) {
     unordered_map<string, unordered_set<string>> nmap_set, cmap_set;
 
-    auto file = ifstream(fname);
+    auto file = ifstream{fname};
 
     file >> balance_;
 
@@ -93,16 +111,18 @@ void floor_plan::input(const string fname) {
             cell->push_net(net_id);
         }
     }
+
+    tolerate_ = static_cast<unsigned>(balance_ * csize);
 }
 
-void floor_plan::output(const string fname) {
+void floor_plan::output(string fname) {
     stringstream ss;
     auto file = ofstream(fname);
 
     unsigned cut_size = 0;
     for (unsigned idx = 0; idx < net_map_.size(); ++idx) {
         const net* net = net_map_[idx];
-        if (net->true_count() && net->false_count()) {
+        if (net->count<int>() && net->count<float>()) {
             ++cut_size;
         }
     }

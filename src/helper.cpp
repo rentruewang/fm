@@ -17,11 +17,11 @@ void store_updates(vector<cell*>& cmap,
     switch (mod) {
         case modi::inc:
             new_gain = old_gain + 1;
-            cell->inc_gain();
+            ++*cell;
             break;
         case modi::dec:
             new_gain = old_gain - 1;
-            cell->dec_gain();
+            --*cell;
             break;
     }
     if (records.contains(name)) {
@@ -41,17 +41,17 @@ int flip_cell(vector<net*>& nmap,
     int cutsize_reduction = 0;
 
     const vector<unsigned>& nets = named_cell->nets();
-    const bool fromSide = named_cell->side();
+    const bool from_side = named_cell->side();
 
     for (unsigned idx = 0; idx < nets.size(); ++idx) {
         const unsigned nname = nets[idx];
         net* net = nmap[nname];
         const vector<unsigned>& cells = net->cells();
 
-        const unsigned toCount = net->count(!fromSide);
+        const unsigned to_count = net->count(!from_side);
 
         unsigned jdx, cnt;
-        switch (toCount) {
+        switch (to_count) {
             case 0:
                 --cutsize_reduction;
                 for (jdx = 0; jdx < cells.size(); ++jdx) {
@@ -64,7 +64,7 @@ int flip_cell(vector<net*>& nmap,
                 for (jdx = cnt = 0; jdx < cells.size(); ++jdx) {
                     const unsigned other_name = cells[jdx];
                     cell* other_end = cmap[cells[jdx]];
-                    if (other_end->side() != fromSide) {
+                    if (other_end->side() != from_side) {
                         store_updates<modi::dec>(cmap, records, other_name);
                         ++cnt;
                     }
@@ -75,10 +75,10 @@ int flip_cell(vector<net*>& nmap,
         // cell is moved here
         named_cell->flip();
 
-        net->dec_count(fromSide);
-        const unsigned fromCount = net->count(fromSide);
+        net->dec_count(from_side);
+        const unsigned from_count = net->count(from_side);
 
-        switch (fromCount) {
+        switch (from_count) {
             case 0:
                 ++cutsize_reduction;
                 for (jdx = 0; jdx < cells.size(); ++jdx) {
@@ -91,7 +91,7 @@ int flip_cell(vector<net*>& nmap,
                 for (jdx = cnt = 0; jdx < cells.size(); ++jdx) {
                     const unsigned other_name = cells[jdx];
                     cell* other_end = cmap[cells[jdx]];
-                    if (other_end->side() == fromSide) {
+                    if (other_end->side() == from_side) {
                         store_updates<modi::inc>(cmap, records, other_name);
                         ++cnt;
                     }

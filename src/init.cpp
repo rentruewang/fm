@@ -20,15 +20,15 @@ unsigned naive_init::init(std::vector<cell*>& cells) const {
 }
 
 unsigned sophisticated_init::init(std::vector<cell*>& cells) const {
-    unsigned too_much = (cells.size() >> 1) + tolerate_;
+    unsigned too_much = (cells.size() >> 1) + tolerate();
 
-    unsigned net_size = nets_.size();
+    unsigned net_size = nets().size();
     unordered_set<unsigned> cell_inited;
 
     unsigned net_idx, count_true, count_false;
     for (net_idx = count_true = count_false = 0; net_idx < net_size;
          ++net_idx) {
-        const vector<unsigned>& associated = nets_[net_idx]->cells();
+        const vector<unsigned>& associated = nets()[net_idx]->cells();
 
         unsigned cell_idx, confirmed_true, confirmed_false, unconfirmed;
         for (cell_idx = confirmed_true = confirmed_false = unconfirmed = 0;
@@ -93,8 +93,16 @@ unsigned sophisticated_init::init(std::vector<cell*>& cells) const {
     return count_true;
 }
 
-void floor_plan::init_side() {
-    total_count_ = init_->init(cell_map_);
+const std::vector<net*>& sophisticated_init::nets() const {
+    return fp_.nmap();
+}
+unsigned sophisticated_init::tolerate() const {
+    return fp_.tolerate();
+}
+
+void floor_plan::init_side(const init_strategy& init) {
+    sort_net_list();
+    total_count_ = init.init(cell_map_);
 }
 
 void floor_plan::init_gains() {
@@ -109,7 +117,7 @@ void floor_plan::init_gains() {
             }
         }
 
-        net->setCount(cnt);
+        net->set_count(cnt);
 
         if (cnt == 0 || cnt == cells.size()) {
             for (unsigned cname : cells) {

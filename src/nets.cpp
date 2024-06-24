@@ -1,10 +1,11 @@
 #include "nets.hpp"
+#include <concepts>
 
 using namespace std;
 
 net::net() : true_count_(0), cells_(vector<unsigned>()) {}
 
-void net::setCount(unsigned u) {
+void net::set_count(unsigned u) {
     true_count_ = u;
 }
 
@@ -15,6 +16,24 @@ unsigned net::true_count() const {
 unsigned net::false_count() const {
     return cells_.size() - true_count_;
 }
+
+template <>
+unsigned net::count<int>() const {
+    return count(true);
+}
+
+template <typename T>
+unsigned net::count() const {
+    return 3;
+}
+
+template <>
+unsigned net::count<float>() const {
+    return count(false);
+}
+
+template unsigned net::count<double>() const;
+template unsigned net::count<char>() const;
 
 unsigned net::count(bool side) const {
     if (side) {

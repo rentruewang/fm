@@ -1,5 +1,6 @@
+#include <concepts>
 #include "fm.hpp"
-
+#include "init.hpp"
 using namespace std;
 
 floor_plan::floor_plan() : floor_plan(vector<net*>(), vector<cell*>()) {}
@@ -13,12 +14,12 @@ floor_plan::floor_plan(vector<net*>& n, vector<cell*>& c)
       tolerate_((unsigned)-1) {}
 
 floor_plan::floor_plan(vector<net*>&& n, vector<cell*>&& c)
-    : net_map_(move(n)),
-      cell_map_(move(c)),
+    : net_map_(std::move(n)),
+      cell_map_(std::move(c)),
       balance_(0.),
       total_count_((unsigned)-1),
       tolerate_((unsigned)-1) {
-    bucket_ = move(bucket(cell_map_));
+    bucket_ = std::move(bucket(cell_map_));
 }
 
 floor_plan::~floor_plan() {
@@ -29,10 +30,6 @@ floor_plan::~floor_plan() {
     for (cell* cptr : cell_map_) {
         delete cptr;
     }
-}
-
-void floor_plan::tolerate(unsigned amount) {
-    tolerate_ = amount;
 }
 
 void floor_plan::nmap(vector<net*>&& nmap) {
@@ -61,4 +58,8 @@ const vector<cell*>& floor_plan::cmap() const {
 
 double floor_plan::balance() const {
     return balance_;
+}
+
+unsigned floor_plan::tolerate() const {
+    return tolerate_;
 }

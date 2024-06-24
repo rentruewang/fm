@@ -4,26 +4,28 @@
 #include <unordered_map>
 #include "cells.hpp"
 #include "fm.hpp"
+#include "init.hpp"
 #include "nets.hpp"
 
 int main(int argc, char const* argv[]) {
-    using namespace std;
-
     assert(argc == 3);
 
     floor_plan fp;
 
-    fp.input(string(argv[1]));
+    fp << argv[1];
 
-    unsigned nsize = fp.nmap().size();
-    unsigned csize = fp.cmap().size();
-    double bal = fp.balance();
+    init_strategy* strat;
 
-    unsigned tolerate = static_cast<unsigned>(bal * csize);
-    fp.tolerate(tolerate);
-    fp.init_side();
+    auto soph_init{sophisticated_init{fp}};
+    auto naiv_init{naive_init{fp}};
+
+    strat = &soph_init;
+    strat = &naiv_init;
+
+    fp.init_side(*strat);
     fp.fm();
-    fp.output(string(argv[2]));
+
+    fp >> argv[2];
 
     return 0;
 }

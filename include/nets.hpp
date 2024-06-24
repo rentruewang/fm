@@ -6,11 +6,13 @@ class net {
    public:
     net();
 
-    void setCount(unsigned u);
+    void set_count(unsigned u);
 
-    unsigned true_count() const;
-    unsigned false_count() const;
+    template <typename side>
+    unsigned count() const;
+
     unsigned count(bool side) const;
+
     void inc_count(bool side);
     void dec_count(bool side);
 
@@ -21,4 +23,7 @@ class net {
    private:
     unsigned true_count_;
     std::vector<unsigned> cells_;
+
+    unsigned true_count() const;
+    unsigned false_count() const;
 };
