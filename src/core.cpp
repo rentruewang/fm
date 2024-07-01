@@ -47,14 +47,9 @@ int floor_plan::fm_once(function<bool(const unsigned)> condition) {
         }
     }
 
-    int total = acc;
-
     for (count = max_idx; count < history.size(); ++count) {
         const unsigned curr_cname = history[count];
-
-        once = flip(next_bucket, seen, curr_cname);
-
-        total += once;
+        flip(next_bucket, seen, curr_cname);
     }
 
     bucket_ = std::move(next_bucket);
@@ -67,23 +62,18 @@ void floor_plan::fm() {
 
     init_bucket();
 
-    const unsigned SIZE = cell_map_.size();
-    const unsigned MIDDLE = SIZE >> 1;
-    const unsigned LOWER = MIDDLE - tolerate_;
-    const unsigned UPPER = MIDDLE + tolerate_;
+    unsigned size = cell_map_.size();
+    unsigned middle = size >> 1;
+    unsigned lower = middle - tolerate_;
+    unsigned upper = middle + tolerate_;
 
-    auto runner = [&](unsigned iter) -> bool {
-        auto is_balanced = [=](const unsigned size) -> bool {
-            return size > LOWER && size < UPPER;
+    auto runner = [&]() -> bool {
+        auto is_balanced = [=](unsigned size) -> bool {
+            return lower < size && size < upper;
         };
         return fm_once(is_balanced) > 0;
     };
 
-    for (unsigned iter = 0; runner(iter); ++iter)
+    while (runner())
         ;
-
-    unsigned count_true = 0;
-    for (cell* cell : cell_map_) {
-        count_true += cell->side();
-    }
 }

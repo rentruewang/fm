@@ -1,6 +1,6 @@
-#include <concepts>
 #include "fm.hpp"
 #include "init.hpp"
+
 using namespace std;
 
 floor_plan::floor_plan() : floor_plan(vector<net*>(), vector<cell*>()) {}
@@ -19,7 +19,7 @@ floor_plan::floor_plan(vector<net*>&& n, vector<cell*>&& c)
       balance_(0.),
       total_count_((unsigned)-1),
       tolerate_((unsigned)-1) {
-    bucket_ = std::move(bucket(cell_map_));
+    bucket_ = bucket(std::move(cell_map_));
 }
 
 floor_plan::~floor_plan() {
