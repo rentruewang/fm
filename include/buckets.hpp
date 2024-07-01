@@ -1,41 +1,34 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <unordered_set>
+
 #include "cells.hpp"
 
-class list {
-   public:
-    list();
-    const std::unordered_set<unsigned>& get() const;
-    unsigned size() const;
-    void push(unsigned name);
-    unsigned pop();
-    bool contains(const unsigned name) const;
-    void erase(const unsigned name);
+using unsigned_set = std::unordered_set<unsigned>;
 
-   private:
-    std::unordered_set<unsigned> cells_;
-};
+struct gain_delta;
 
 class bucket {
    public:
     bucket();
-    bucket(const std::vector<cell*>& cmap);
+    bucket(const std::vector<std::shared_ptr<cell>>& cmap);
 
     bucket& operator=(bucket&& b);
 
-    const std::map<int, list>& get() const;
+    const std::map<int, unsigned_set>& get() const;
 
-    void push(const unsigned name, const cell* cell);
+    void push(const unsigned name, const cell& cell);
     unsigned pop();
     unsigned size() const;
 
     bool contains(unsigned name);
     void update(int old_gain, int new_gain, unsigned name);
-    void fill(const std::vector<cell*>& cmap);
+    void update(gain_delta delta, unsigned name);
+    void fill(const std::vector<std::shared_ptr<cell>>& cmap);
     void empty(bucket& other, std::unordered_set<unsigned>& seen);
 
    private:
-    std::map<int, list> bucket_;
+    std::map<int, unsigned_set> bucket_;
 };

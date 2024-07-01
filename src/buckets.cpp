@@ -1,59 +1,32 @@
 #include "buckets.hpp"
 
+#include "helper.hpp"
+
 using namespace std;
 
-list::list() : cells_(unordered_set<unsigned>()) {}
+bucket::bucket() : bucket_(map<int, unsigned_set>()) {}
 
-const unordered_set<unsigned>& list::get() const {
-    return cells_;
-}
-
-unsigned list::size() const {
-    return cells_.size();
-}
-
-void list::push(unsigned name) {
-    cells_.insert(name);
-}
-
-unsigned list::pop() {
-    auto last = cells_.begin();
-    const unsigned cell = *last;
-    cells_.erase(last);
-
-    return cell;
-}
-
-bool list::contains(const unsigned name) const {
-    return cells_.contains(name);
-}
-
-void list::erase(const unsigned name) {
-    cells_.erase(name);
-}
-
-bucket::bucket() : bucket_(map<int, list>()) {}
-
-bucket::bucket(const vector<cell*>& cmap) : bucket_(map<int, list>()) {
+bucket::bucket(const vector<shared_ptr<cell>>& cmap)
+    : bucket_(map<int, unsigned_set>()) {
     fill(cmap);
 }
 
-const map<int, list>& bucket::get() const {
+const map<int, unsigned_set>& bucket::get() const {
     return bucket_;
 }
 
-void bucket::push(const unsigned name, const cell* cell) {
-    int gain = cell->gain();
-    bucket_[gain].push(name);
+void bucket::push(const unsigned name, const cell& cell) {
+    int gain = cell.gain();
+    bucket_[gain].insert(name);
 }
 
 unsigned bucket::pop() {
-    auto max_iter = bucket_.rbegin();
-    list& list = max_iter->second;
+    auto& [gain, lst] = *bucket_.rbegin();
 
-    const unsigned cell = list.pop();
-    if (list.size() == 0) {
-        bucket_.erase(max_iter->first);
+    auto begin = *lst.begin();
+    const unsigned cell = lst.erase(begin);
+    if (lst.size() == 0) {
+        bucket_.erase(gain);
     }
 
     return cell;
@@ -62,14 +35,16 @@ unsigned bucket::pop() {
 unsigned bucket::size() const {
     unsigned count = 0;
     for (auto iter = bucket_.begin(); iter != bucket_.end(); ++iter) {
-        count += iter->second.size();
+        const auto& [_, lst] = *iter;
+        count += lst.size();
     }
     return count;
 }
 
 bool bucket::contains(unsigned name) {
     for (auto iter = bucket_.begin(); iter != bucket_.end(); ++iter) {
-        if (iter->second.contains(name)) {
+        const auto& [_, lst] = *iter;
+        if (lst.contains(name)) {
             return true;
         }
     }
@@ -85,12 +60,16 @@ void bucket::update(int old_gain, int new_gain, unsigned name) {
     }
     auto& new_list = bucket_[new_gain];
 
-    new_list.push(name);
+    new_list.insert(name);
 }
 
-void bucket::fill(const vector<cell*>& cmap) {
+void bucket::update(gain_delta gain, unsigned name) {
+    return update(gain.original, gain.updated, name);
+}
+
+void bucket::fill(const vector<shared_ptr<cell>>& cmap) {
     for (unsigned idx = 0; idx < cmap.size(); ++idx) {
-        push(idx, cmap[idx]);
+        push(idx, *cmap[idx]);
     }
 }
 
@@ -102,12 +81,12 @@ bucket& bucket::operator=(bucket&& b) {
 void bucket::empty(bucket& other, unordered_set<unsigned>& seen) {
     for (auto iter = other.bucket_.begin(); iter != other.bucket_.end();
          ++iter) {
-        const unsigned gain = iter->first;
-        list& list = iter->second;
+        auto& [gain, lst] = *iter;
 
-        for (unsigned idx = 0, SIZE = list.size(); idx < SIZE; ++idx) {
-            unsigned value = list.pop();
-            bucket_[gain].push(value);
+        for (unsigned i = 0, size = lst.size(); i < size; ++i) {
+            auto begin = *lst.begin();
+            unsigned value = lst.erase(begin);
+            bucket_[gain].insert(value);
             seen.insert(value);
         }
     }

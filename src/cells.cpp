@@ -2,18 +2,18 @@
 
 using namespace std;
 
-cell::cell() : side_(0), gain_(0), nets_(vector<unsigned>()) {}
+cell::cell() : side_(false), gain_(0), nets_(vector<unsigned>()) {}
 
 void cell::flip() {
     side_ = !side_;
 }
 
 void cell::side(bool s) {
-    side_ = static_cast<int>(s);
+    side_ = s;
 }
 
 bool cell::side() const {
-    return static_cast<bool>(side_);
+    return side_;
 }
 
 int cell::gain() const {

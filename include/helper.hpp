@@ -1,7 +1,9 @@
 #pragma once
 
+#include <memory>
 #include <unordered_map>
 #include <vector>
+
 #include "buckets.hpp"
 #include "cells.hpp"
 #include "nets.hpp"
@@ -17,7 +19,7 @@ struct gain_delta {
 };
 
 template <modi mod>
-void store_updates(std::vector<cell*>& cmap,
+void store_updates(std::vector<std::shared_ptr<cell>>& cmap,
                    std::unordered_map<unsigned, gain_delta>& records,
                    const unsigned name);
 

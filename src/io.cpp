@@ -3,8 +3,8 @@
 #include <istream>
 #include <ostream>
 #include <sstream>
-#include <string_view>
 #include <unordered_set>
+
 #include "fm.hpp"
 
 using namespace std;
@@ -73,10 +73,10 @@ void floor_plan::input(string fname) {
     cell_names_.reserve(csize);
 
     for (unsigned idx = 0; idx < nsize; ++idx) {
-        net_map_.push_back(new net());
+        net_map_.push_back(make_shared<net>());
     }
     for (unsigned idx = 0; idx < csize; ++idx) {
-        cell_map_.push_back(new cell());
+        cell_map_.push_back(make_shared<cell>());
     }
 
     for (auto iter : nmap_set) {
@@ -100,14 +100,14 @@ void floor_plan::input(string fname) {
         const auto& cell_list = iter.second;
         const unsigned net_id = rev_nnames[nname];
 
-        net* net = net_map_[net_id];
+        auto net = net_map_[net_id];
 
         for (string cname : cell_list) {
             const unsigned cell_id = rev_cnames[cname];
 
             net->push_cell(cell_id);
 
-            cell* cell = cell_map_[cell_id];
+            auto cell = cell_map_[cell_id];
             cell->push_net(net_id);
         }
     }
@@ -121,10 +121,8 @@ void floor_plan::output(string fname) {
 
     unsigned cut_size = 0;
     for (unsigned idx = 0; idx < net_map_.size(); ++idx) {
-        const net* net = net_map_[idx];
-        if (net->count<int>() && net->count<float>()) {
-            ++cut_size;
-        }
+        const auto n = net_map_[idx];
+        cut_size += static_cast<int>(n->count<true>() && n->count<false>());
     }
 
     ss << "Cutsize = " << cut_size << "\n";
@@ -138,7 +136,7 @@ void floor_plan::output(string fname) {
 
     for (unsigned idx = 0; idx < cell_map_.size(); ++idx) {
         const string name = cell_names_[idx];
-        const cell* cell = cell_map_[idx];
+        const auto cell = cell_map_[idx];
         if (cell->side()) {
             ++true_count;
             true_ss << name << " ";

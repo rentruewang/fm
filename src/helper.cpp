@@ -1,17 +1,20 @@
 #include "helper.hpp"
+
 #include <unordered_map>
 #include <vector>
+
 #include "cells.hpp"
 #include "fm.hpp"
 #include "nets.hpp"
 
 using namespace std;
 
+// Template definition visible for all usage, so it's ok.
 template <modi mod>
-void store_updates(vector<cell*>& cmap,
+void store_updates(vector<shared_ptr<cell>>& cmap,
                    unordered_map<unsigned, gain_delta>& records,
                    unsigned name) {
-    cell* cell = cmap[name];
+    auto cell = cmap[name];
     int old_gain = cell->gain();
     int new_gain;
     switch (mod) {
@@ -32,21 +35,21 @@ void store_updates(vector<cell*>& cmap,
     }
 }
 
-int flip_cell(vector<net*>& nmap,
-              vector<cell*>& cmap,
+int flip_cell(vector<shared_ptr<net>>& nmap,
+              vector<shared_ptr<cell>>& cmap,
               unsigned cname,
               unordered_map<unsigned, gain_delta>& records) {
-    cell* named_cell = cmap[cname];
+    auto named_cell = cmap[cname];
 
     int cutsize_reduction = 0;
 
-    const vector<unsigned>& nets = named_cell->nets();
+    const auto& nets = named_cell->nets();
     const bool from_side = named_cell->side();
 
     for (unsigned idx = 0; idx < nets.size(); ++idx) {
         const unsigned nname = nets[idx];
-        net* net = nmap[nname];
-        const vector<unsigned>& cells = net->cells();
+        auto net = nmap[nname];
+        const auto& cells = net->cells();
 
         const unsigned to_count = net->count(!from_side);
 
@@ -63,7 +66,7 @@ int flip_cell(vector<net*>& nmap,
             case 1:
                 for (jdx = cnt = 0; jdx < cells.size(); ++jdx) {
                     const unsigned other_name = cells[jdx];
-                    cell* other_end = cmap[cells[jdx]];
+                    auto other_end = cmap[cells[jdx]];
                     if (other_end->side() != from_side) {
                         store_updates<modi::dec>(cmap, records, other_name);
                         ++cnt;
@@ -90,7 +93,7 @@ int flip_cell(vector<net*>& nmap,
             case 1:
                 for (jdx = cnt = 0; jdx < cells.size(); ++jdx) {
                     const unsigned other_name = cells[jdx];
-                    cell* other_end = cmap[cells[jdx]];
+                    auto other_end = cmap[cells[jdx]];
                     if (other_end->side() == from_side) {
                         store_updates<modi::inc>(cmap, records, other_name);
                         ++cnt;
@@ -109,7 +112,7 @@ int flip_cell(vector<net*>& nmap,
     return cutsize_reduction;
 }
 
-int floor_plan::flip(bucket& nbucket,
+int floor_plan::flip(bucket& next_bucket,
                      const unordered_set<unsigned>& seen,
                      unsigned cname) {
     unordered_map<unsigned, gain_delta> records;
@@ -122,12 +125,11 @@ int floor_plan::flip(bucket& nbucket,
     int gain = flip_cell(net_map_, cell_map_, cname, records);
 
     for (auto iter = records.begin(); iter != records.end(); ++iter) {
-        const unsigned name = iter->first;
-        const gain_delta& record = iter->second;
+        const auto& [name, record] = *iter;
         if (seen.contains(name)) {
-            nbucket.update(record.original, record.updated, name);
+            next_bucket.update(record, name);
         } else {
-            bucket_.update(record.original, record.updated, name);
+            bucket_.update(record, name);
         }
     }
 

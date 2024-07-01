@@ -1,17 +1,19 @@
 #include "init.hpp"
+
 #include <algorithm>
+
 #include "fm.hpp"
 
 using namespace std;
 
 void floor_plan::sort_net_list() {
-    auto net_cmp = [](const net* n1, const net* n2) {
+    auto net_cmp = [](const auto n1, const auto n2) {
         return n1->size() < n2->size();
     };
     sort(net_map_.begin(), net_map_.end(), net_cmp);
 }
 
-unsigned naive_init::init(std::vector<cell*>& cells) const {
+unsigned naive_init::init(vector<shared_ptr<cell>>& cells) const {
     unsigned half = cells.size() / 2;
     for (unsigned idx = 0, cnt = 0; idx < cells.size(); ++idx, ++cnt) {
         cells[idx]->side(cnt < half);
@@ -19,7 +21,7 @@ unsigned naive_init::init(std::vector<cell*>& cells) const {
     return half;
 }
 
-unsigned sophisticated_init::init(std::vector<cell*>& cells) const {
+unsigned sophisticated_init::init(vector<shared_ptr<cell>>& cells) const {
     unsigned too_much = (cells.size() >> 1) + tolerate();
 
     unsigned net_size = nets().size();
@@ -28,14 +30,14 @@ unsigned sophisticated_init::init(std::vector<cell*>& cells) const {
     unsigned net_idx, count_true, count_false;
     for (net_idx = count_true = count_false = 0; net_idx < net_size;
          ++net_idx) {
-        const vector<unsigned>& associated = nets()[net_idx]->cells();
+        const auto& associated = nets()[net_idx]->cells();
 
         unsigned cell_idx, confirmed_true, confirmed_false, unconfirmed;
         for (cell_idx = confirmed_true = confirmed_false = unconfirmed = 0;
              cell_idx < associated.size(); ++cell_idx) {
-            const unsigned name = associated[cell_idx];
+            unsigned name = associated[cell_idx];
             if (cell_inited.contains(name)) {
-                const cell* cell = cells[name];
+                const auto cell = cells[name];
                 if (cell->side()) {
                     ++confirmed_true;
                 } else {
@@ -51,7 +53,7 @@ unsigned sophisticated_init::init(std::vector<cell*>& cells) const {
             for (unsigned name : associated) {
                 if (!cell_inited.contains(name)) {
                     cell_inited.insert(name);
-                    cell* cell = cells[name];
+                    auto cell = cells[name];
                     cell->side(true);
                     ++count_true;
                 }
@@ -60,7 +62,7 @@ unsigned sophisticated_init::init(std::vector<cell*>& cells) const {
             for (unsigned name : associated) {
                 if (!cell_inited.contains(name)) {
                     cell_inited.insert(name);
-                    cell* cell = cells[name];
+                    auto cell = cells[name];
                     cell->side(false);
                     ++count_false;
                 }
@@ -71,7 +73,7 @@ unsigned sophisticated_init::init(std::vector<cell*>& cells) const {
                 for (unsigned name : associated) {
                     if (!cell_inited.contains(name)) {
                         cell_inited.insert(name);
-                        cell* cell = cells[name];
+                        auto cell = cells[name];
                         cell->side(false);
                         ++count_false;
                     }
@@ -81,7 +83,7 @@ unsigned sophisticated_init::init(std::vector<cell*>& cells) const {
                     const unsigned name = associated[cell_idx];
                     if (!cell_inited.contains(name)) {
                         cell_inited.insert(name);
-                        cell* cell = cells[name];
+                        auto cell = cells[name];
                         cell->side(true);
                         ++count_true;
                     }
@@ -93,7 +95,7 @@ unsigned sophisticated_init::init(std::vector<cell*>& cells) const {
     return count_true;
 }
 
-const std::vector<net*>& sophisticated_init::nets() const {
+const vector<shared_ptr<net>>& sophisticated_init::nets() const {
     return fp_.nmap();
 }
 unsigned sophisticated_init::tolerate() const {
@@ -108,40 +110,33 @@ void floor_plan::init_side(const init_strategy& init) {
 void floor_plan::init_gains() {
     vector<int> simulation = vector<int>(cell_map_.size(), 0);
 
-    for (net* net : net_map_) {
-        const vector<unsigned>& cells = net->cells();
+    for (auto net : net_map_) {
+        const auto& cells = net->cells();
         unsigned cnt = 0;
-        for (unsigned cname : cells) {
-            if (cell_map_[cname]->side()) {
-                ++cnt;
-            }
+        for (auto cname : cells) {
+            cnt += static_cast<int>(cell_map_[cname]->side());
         }
 
-        net->set_count(cnt);
+        net->set_true_count(cnt);
 
         if (cnt == 0 || cnt == cells.size()) {
             for (unsigned cname : cells) {
                 --(simulation[cname]);
             }
         } else {
-            unsigned count;
             if (cnt == 1) {
-                count = 0;
                 for (unsigned cname : cells) {
-                    cell* cell = cell_map_[cname];
+                    auto cell = cell_map_[cname];
                     if (cell->side()) {
                         ++(simulation[cname]);
-                        ++count;
                     }
                 }
             }
             if (cnt + 1 == cells.size()) {
-                count = 0;
                 for (unsigned cname : cells) {
-                    cell* cell = cell_map_[cname];
+                    auto cell = cell_map_[cname];
                     if (!(cell->side())) {
                         ++(simulation[cname]);
-                        ++count;
                     }
                 }
             }

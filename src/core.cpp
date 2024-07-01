@@ -1,5 +1,7 @@
+#include <algorithm>
 #include <unordered_set>
 #include <utility>
+
 #include "buckets.hpp"
 #include "fm.hpp"
 
@@ -17,10 +19,10 @@ int floor_plan::fm_once(function<bool(const unsigned)> condition) {
     int max_gain, acc, once;
     for (count = max_idx = 0, max_gain = acc = 0; count < SIZE; ++count) {
         const unsigned curr_cname = bucket_.pop();
-        cell* cell = cell_map_[curr_cname];
+        auto cell = cell_map_[curr_cname];
 
         seen.insert(curr_cname);
-        next_bucket.push(curr_cname, cell);
+        next_bucket.push(curr_cname, *cell);
 
         const unsigned new_tcount =
             cell->side() ? total_count_ - 1 : total_count_ + 1;
@@ -32,9 +34,7 @@ int floor_plan::fm_once(function<bool(const unsigned)> condition) {
         once = flip(next_bucket, seen, curr_cname);
         acc += once;
 
-        if (max_once < once) {
-            max_once = once;
-        }
+        max_once = std::max(max_once, once);
 
         history.push_back(curr_cname);
         if (acc >= max_gain) {
@@ -48,7 +48,7 @@ int floor_plan::fm_once(function<bool(const unsigned)> condition) {
     }
 
     for (count = max_idx; count < history.size(); ++count) {
-        const unsigned curr_cname = history[count];
+        const auto curr_cname = history[count];
         flip(next_bucket, seen, curr_cname);
     }
 

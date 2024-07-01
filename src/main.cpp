@@ -1,11 +1,8 @@
 #include <cassert>
-#include <iostream>
 #include <string>
-#include <unordered_map>
-#include "cells.hpp"
+
 #include "fm.hpp"
 #include "init.hpp"
-#include "nets.hpp"
 
 int main(int argc, char const* argv[]) {
     assert(argc == 3);

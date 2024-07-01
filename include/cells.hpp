@@ -30,7 +30,7 @@ class cell {
 
    private:
     // using int to prevent padding issue
-    int side_;
+    bool side_;
     int gain_;
     std::vector<unsigned> nets_;
 

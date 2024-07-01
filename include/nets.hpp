@@ -6,9 +6,9 @@ class net {
    public:
     net();
 
-    void set_count(unsigned u);
+    void set_true_count(unsigned u);
 
-    template <typename side>
+    template <bool side>
     unsigned count() const;
 
     unsigned count(bool side) const;
