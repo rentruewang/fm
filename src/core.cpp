@@ -7,9 +7,9 @@
 
 using namespace std;
 
-int floor_plan::fm_once(function<bool(const unsigned)> condition) {
+int FloorPlan::fm_once(function<bool(const unsigned)> condition) {
     unordered_set<unsigned> seen;
-    bucket next_bucket;
+    Bucket next_bucket;
     vector<unsigned> history;
 
     const unsigned SIZE = cell_map_.size();
@@ -57,7 +57,7 @@ int floor_plan::fm_once(function<bool(const unsigned)> condition) {
     return max_gain;
 }
 
-void floor_plan::fm() {
+void FloorPlan::fm() {
     init_gains();
 
     init_bucket();

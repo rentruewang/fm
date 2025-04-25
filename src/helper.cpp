@@ -10,19 +10,19 @@
 using namespace std;
 
 // Template definition visible for all usage, so it's ok.
-template <modi mod>
-void store_updates(vector<shared_ptr<cell>>& cmap,
+template <ModKind mod>
+void store_updates(vector<shared_ptr<Cell>>& cmap,
                    unordered_map<unsigned, gain_delta>& records,
                    unsigned name) {
     auto cell = cmap[name];
     int old_gain = cell->gain();
     int new_gain;
     switch (mod) {
-        case modi::inc:
+        case ModKind::INC:
             new_gain = old_gain + 1;
             ++*cell;
             break;
-        case modi::dec:
+        case ModKind::DEC:
             new_gain = old_gain - 1;
             --*cell;
             break;
@@ -35,8 +35,8 @@ void store_updates(vector<shared_ptr<cell>>& cmap,
     }
 }
 
-int flip_cell(vector<shared_ptr<net>>& nmap,
-              vector<shared_ptr<cell>>& cmap,
+int flip_cell(vector<shared_ptr<Net>>& nmap,
+              vector<shared_ptr<Cell>>& cmap,
               unsigned cname,
               unordered_map<unsigned, gain_delta>& records) {
     auto named_cell = cmap[cname];
@@ -59,16 +59,16 @@ int flip_cell(vector<shared_ptr<net>>& nmap,
                 --cutsize_reduction;
                 for (jdx = 0; jdx < cells.size(); ++jdx) {
                     const unsigned other_name = cells[jdx];
-                    store_updates<modi::inc>(cmap, records, other_name);
+                    store_updates<ModKind::INC>(cmap, records, other_name);
                 }
-                store_updates<modi::inc>(cmap, records, cname);
+                store_updates<ModKind::INC>(cmap, records, cname);
                 break;
             case 1:
                 for (jdx = cnt = 0; jdx < cells.size(); ++jdx) {
                     const unsigned other_name = cells[jdx];
                     auto other_end = cmap[cells[jdx]];
                     if (other_end->side() != from_side) {
-                        store_updates<modi::dec>(cmap, records, other_name);
+                        store_updates<ModKind::DEC>(cmap, records, other_name);
                         ++cnt;
                     }
                 }
@@ -86,16 +86,16 @@ int flip_cell(vector<shared_ptr<net>>& nmap,
                 ++cutsize_reduction;
                 for (jdx = 0; jdx < cells.size(); ++jdx) {
                     const unsigned other_name = cells[jdx];
-                    store_updates<modi::dec>(cmap, records, other_name);
+                    store_updates<ModKind::DEC>(cmap, records, other_name);
                 }
-                store_updates<modi::dec>(cmap, records, cname);
+                store_updates<ModKind::DEC>(cmap, records, cname);
                 break;
             case 1:
                 for (jdx = cnt = 0; jdx < cells.size(); ++jdx) {
                     const unsigned other_name = cells[jdx];
                     auto other_end = cmap[cells[jdx]];
                     if (other_end->side() == from_side) {
-                        store_updates<modi::inc>(cmap, records, other_name);
+                        store_updates<ModKind::INC>(cmap, records, other_name);
                         ++cnt;
                     }
                 }
@@ -112,7 +112,7 @@ int flip_cell(vector<shared_ptr<net>>& nmap,
     return cutsize_reduction;
 }
 
-int floor_plan::flip(bucket& next_bucket,
+int FloorPlan::flip(Bucket& next_bucket,
                      const unordered_set<unsigned>& seen,
                      unsigned cname) {
     unordered_map<unsigned, gain_delta> records;

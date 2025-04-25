@@ -5,9 +5,9 @@ using namespace std;
 
 // Since net_map_ and cell_map_ are shared, can't use `unique_ptr` here.
 // https://stackoverflow.com/questions/73714773/no-matching-function-for-call-to-construct-at
-floor_plan::floor_plan() : net_map_({}), cell_map_({}) {}
+FloorPlan::FloorPlan() : net_map_({}), cell_map_({}) {}
 
-floor_plan::floor_plan(vector<shared_ptr<net>>& n, vector<shared_ptr<cell>>& c)
+FloorPlan::FloorPlan(vector<shared_ptr<Net>>& n, vector<shared_ptr<Cell>>& c)
     : net_map_(n),
       cell_map_(c),
       bucket_(),
@@ -15,44 +15,44 @@ floor_plan::floor_plan(vector<shared_ptr<net>>& n, vector<shared_ptr<cell>>& c)
       total_count_((unsigned)-1),
       tolerate_((unsigned)-1) {}
 
-floor_plan::floor_plan(vector<shared_ptr<net>>&& n,
-                       vector<shared_ptr<cell>>&& c)
+FloorPlan::FloorPlan(vector<shared_ptr<Net>>&& n,
+                       vector<shared_ptr<Cell>>&& c)
     : net_map_(std::move(n)),
       cell_map_(std::move(c)),
       balance_(0.),
       total_count_((unsigned)-1),
       tolerate_((unsigned)-1) {
-    bucket_ = bucket(cell_map_);
+    bucket_ = Bucket(cell_map_);
 }
 
-void floor_plan::nmap(vector<shared_ptr<net>>&& net_map) {
+void FloorPlan::nmap(vector<shared_ptr<Net>>&& net_map) {
     this->net_map_ = std::move(net_map);
 }
 
-vector<shared_ptr<net>>& floor_plan::nmap() {
+vector<shared_ptr<Net>>& FloorPlan::nmap() {
     return net_map_;
 }
 
-const vector<shared_ptr<net>>& floor_plan::nmap() const {
+const vector<shared_ptr<Net>>& FloorPlan::nmap() const {
     return net_map_;
 }
 
-void floor_plan::cmap(vector<shared_ptr<cell>>&& cmap) {
+void FloorPlan::cmap(vector<shared_ptr<Cell>>&& cmap) {
     this->cell_map_ = cmap;
 }
 
-vector<shared_ptr<cell>>& floor_plan::cmap() {
+vector<shared_ptr<Cell>>& FloorPlan::cmap() {
     return cell_map_;
 }
 
-const vector<shared_ptr<cell>>& floor_plan::cmap() const {
+const vector<shared_ptr<Cell>>& FloorPlan::cmap() const {
     return cell_map_;
 }
 
-double floor_plan::balance() const {
+double FloorPlan::balance() const {
     return balance_;
 }
 
-unsigned floor_plan::tolerate() const {
+unsigned FloorPlan::tolerate() const {
     return tolerate_;
 }

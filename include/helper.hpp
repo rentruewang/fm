@@ -8,7 +8,7 @@
 #include "cells.hpp"
 #include "nets.hpp"
 
-enum class modi { inc, dec };
+enum class ModKind { INC, DEC };
 
 struct gain_delta {
     int original;
@@ -18,21 +18,21 @@ struct gain_delta {
     gain_delta(int o, int u) : original(o), updated(u) {}
 };
 
-template <modi mod>
-void store_updates(std::vector<std::shared_ptr<cell>>& cmap,
+template <ModKind mod>
+void store_updates(std::vector<std::shared_ptr<Cell>>& cmap,
                    std::unordered_map<unsigned, gain_delta>& records,
                    const unsigned name);
 
-int flip_cell(std::vector<net*>& nmap,
-              std::vector<cell*>& cmap,
+int flip_cell(std::vector<Net*>& nmap,
+              std::vector<Cell*>& cmap,
               const unsigned cname,
-              cell* cell,
+              Cell* cell,
               std::unordered_map<unsigned, gain_delta>& records);
 
-int flip(std::vector<net*>& nmap,
-         std::vector<cell*>& cmap,
-         bucket& prev,
-         bucket& next,
+int flip(std::vector<Net*>& nmap,
+         std::vector<Cell*>& cmap,
+         Bucket& prev,
+         Bucket& next,
          const std::unordered_set<unsigned>& seen,
          const unsigned cname,
-         cell* cell);
+         Cell* cell);

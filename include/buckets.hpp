@@ -10,24 +10,24 @@ using unsigned_set = std::unordered_set<unsigned>;
 
 struct gain_delta;
 
-class bucket {
+class Bucket {
    public:
-    bucket();
-    bucket(const std::vector<std::shared_ptr<cell>>& cmap);
+    Bucket();
+    Bucket(const std::vector<std::shared_ptr<Cell>>& cmap);
 
-    bucket& operator=(bucket&& b);
+    Bucket& operator=(Bucket&& b);
 
     const std::map<int, unsigned_set>& get() const;
 
-    void push(const unsigned name, const cell& cell);
+    void push(const unsigned name, const Cell& cell);
     unsigned pop();
     unsigned size() const;
 
     bool contains(unsigned name);
     void update(int old_gain, int new_gain, unsigned name);
     void update(gain_delta delta, unsigned name);
-    void fill(const std::vector<std::shared_ptr<cell>>& cmap);
-    void empty(bucket& other, std::unordered_set<unsigned>& seen);
+    void fill(const std::vector<std::shared_ptr<Cell>>& cmap);
+    void empty(Bucket& other, std::unordered_set<unsigned>& seen);
 
    private:
     std::map<int, unsigned_set> bucket_;
