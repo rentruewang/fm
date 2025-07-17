@@ -2,44 +2,44 @@
 
 using namespace std;
 
-Cell::Cell() : side_(false), gain_(0), nets_(vector<unsigned>()) {}
+cell::cell() : side_(false), gain_(0), nets_(vector<unsigned>()) {}
 
-void Cell::flip() {
+void cell::flip() {
     side_ = !side_;
 }
 
-void Cell::side(bool s) {
+void cell::side(bool s) {
     side_ = s;
 }
 
-bool Cell::side() const {
+bool cell::side() const {
     return side_;
 }
 
-int Cell::gain() const {
+int cell::gain() const {
     return gain_;
 }
 
-void Cell::gain(int g) {
+void cell::gain(int g) {
     gain_ = g;
 }
 
-void Cell::inc_gain() {
+void cell::inc_gain() {
     ++gain_;
 }
 
-void Cell::dec_gain() {
+void cell::dec_gain() {
     --gain_;
 }
 
-void Cell::push_net(unsigned net) {
+void cell::push_net(unsigned net) {
     nets_.push_back(net);
 }
 
-const vector<unsigned>& Cell::nets() const {
+const vector<unsigned>& cell::nets() const {
     return nets_;
 }
 
-unsigned Cell::size() const {
+unsigned cell::size() const {
     return nets_.size();
 }

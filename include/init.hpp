@@ -5,34 +5,34 @@
 #include "fm.hpp"
 #include "nets.hpp"
 
-class FloorPlan;
+class floorplan;
 
-class Init {
+class init_strategy {
    public:
-    Init(const FloorPlan& fp) : fp_(fp) {}
-    virtual unsigned init(std::vector<std::shared_ptr<Cell>>& cells) const = 0;
-    virtual ~Init() {}
+    init_strategy(const floorplan& fp) : fp_(fp) {}
+    virtual unsigned init(std::vector<std::shared_ptr<cell>>& cells) const = 0;
+    virtual ~init_strategy() {}
 
-    const FloorPlan& fp() const { return fp_; }
+    const floorplan& fp() const { return fp_; }
 
    protected:
-    const FloorPlan& fp_;
+    const floorplan& fp_;
 };
 
-class NaiveInit final : public Init {
+class naive_init final : public init_strategy {
    public:
-    NaiveInit(const FloorPlan& fp) : Init(fp) {}
-    unsigned init(std::vector<std::shared_ptr<Cell>>& cells) const override;
-    ~NaiveInit() {}
+    naive_init(const floorplan& fp) : init_strategy(fp) {}
+    unsigned init(std::vector<std::shared_ptr<cell>>& cells) const override;
+    ~naive_init() {}
 };
 
-class SophInit final : public Init {
+class sophisticated_init final : public init_strategy {
    public:
-    SophInit(const FloorPlan& fp) : Init(fp) {}
-    unsigned init(std::vector<std::shared_ptr<Cell>>& cells) const override;
-    ~SophInit() {}
+    sophisticated_init(const floorplan& fp) : init_strategy(fp) {}
+    unsigned init(std::vector<std::shared_ptr<cell>>& cells) const override;
+    ~sophisticated_init() {}
 
    private:
-    const std::vector<std::shared_ptr<Net>>& nets() const;
+    const std::vector<std::shared_ptr<net>>& nets() const;
     unsigned tolerate() const;
 };

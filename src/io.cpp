@@ -9,22 +9,22 @@
 
 using namespace std;
 
-FloorPlan& FloorPlan::operator<<(string fname) {
+floorplan& floorplan::operator<<(string fname) {
     input(fname);
     return *this;
 }
 
-FloorPlan& FloorPlan::operator<<(unsigned tolerate) {
+floorplan& floorplan::operator<<(unsigned tolerate) {
     tolerate_ = tolerate;
     return *this;
 }
 
-FloorPlan& FloorPlan::operator>>(string fname) {
+floorplan& floorplan::operator>>(string fname) {
     output(fname);
     return *this;
 }
 
-void FloorPlan::input(string fname) {
+void floorplan::input(string fname) {
     unordered_map<string, unordered_set<string>> nmap_set, cmap_set;
 
     auto file = ifstream{fname};
@@ -73,10 +73,10 @@ void FloorPlan::input(string fname) {
     cell_names_.reserve(csize);
 
     for (unsigned idx = 0; idx < nsize; ++idx) {
-        net_map_.push_back(make_shared<Net>());
+        net_map_.push_back(make_shared<net>());
     }
     for (unsigned idx = 0; idx < csize; ++idx) {
-        cell_map_.push_back(make_shared<Cell>());
+        cell_map_.push_back(make_shared<cell>());
     }
 
     for (auto iter : nmap_set) {
@@ -115,7 +115,7 @@ void FloorPlan::input(string fname) {
     tolerate_ = static_cast<unsigned>(balance_ * csize);
 }
 
-void FloorPlan::output(string fname) {
+void floorplan::output(string fname) {
     stringstream ss;
     auto file = ofstream(fname);
 

@@ -10,42 +10,42 @@
 #include "cells.hpp"
 #include "nets.hpp"
 
-class Init;
+class init_strategy;
 
-class FloorPlan {
+class floorplan {
    public:
-    FloorPlan();
-    FloorPlan(std::vector<std::shared_ptr<Net>>& nmap,
-               std::vector<std::shared_ptr<Cell>>& cmap);
-    FloorPlan(std::vector<std::shared_ptr<Net>>&& nmap,
-               std::vector<std::shared_ptr<Cell>>&& cmap);
+    floorplan();
+    floorplan(std::vector<std::shared_ptr<net>>& nmap,
+              std::vector<std::shared_ptr<cell>>& cmap);
+    floorplan(std::vector<std::shared_ptr<net>>&& nmap,
+              std::vector<std::shared_ptr<cell>>&& cmap);
 
     void fm();
 
-    void nmap(std::vector<std::shared_ptr<Net>>&& nmap);
-    std::vector<std::shared_ptr<Net>>& nmap();
-    const std::vector<std::shared_ptr<Net>>& nmap() const;
+    void nmap(std::vector<std::shared_ptr<net>>&& nmap);
+    std::vector<std::shared_ptr<net>>& nmap();
+    const std::vector<std::shared_ptr<net>>& nmap() const;
 
-    void cmap(std::vector<std::shared_ptr<Cell>>&& cmap);
-    std::vector<std::shared_ptr<Cell>>& cmap();
-    const std::vector<std::shared_ptr<Cell>>& cmap() const;
+    void cmap(std::vector<std::shared_ptr<cell>>&& cmap);
+    std::vector<std::shared_ptr<cell>>& cmap();
+    const std::vector<std::shared_ptr<cell>>& cmap() const;
 
     double balance() const;
 
-    void init_side(const Init& init);
+    void init_side(const init_strategy& init);
     void sort_net_list();
     unsigned tolerate() const;
 
-    FloorPlan& operator<<(std::string fname);
-    FloorPlan& operator<<(unsigned tolerate);
-    FloorPlan& operator>>(std::string fname);
+    floorplan& operator<<(std::string fname);
+    floorplan& operator<<(unsigned tolerate);
+    floorplan& operator>>(std::string fname);
 
    private:
-    std::vector<std::shared_ptr<Net>> net_map_;
-    std::vector<std::shared_ptr<Cell>> cell_map_;
+    std::vector<std::shared_ptr<net>> net_map_;
+    std::vector<std::shared_ptr<cell>> cell_map_;
     std::vector<std::string> net_names_;
     std::vector<std::string> cell_names_;
-    Bucket bucket_;
+    bucket bucket_;
 
     double balance_;
     unsigned total_count_;
@@ -60,7 +60,7 @@ class FloorPlan {
 
     int fm_once(std::function<bool(const unsigned)> condition);
 
-    int flip(Bucket& nbucket,
+    int flip(bucket& nbucket,
              const std::unordered_set<unsigned>& seen,
              unsigned cname);
 };

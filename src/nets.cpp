@@ -2,30 +2,30 @@
 
 using namespace std;
 
-Net::Net() : true_count_(0), cells_(vector<unsigned>()) {}
+net::net() : true_count_(0), cells_(vector<unsigned>()) {}
 
-void Net::set_true_count(unsigned u) {
+void net::set_true_count(unsigned u) {
     true_count_ = u;
 }
 
-unsigned Net::true_count() const {
+unsigned net::true_count() const {
     return true_count_;
 }
 
-unsigned Net::false_count() const {
+unsigned net::false_count() const {
     return cells_.size() - true_count_;
 }
 
 template <bool side>
-unsigned Net::count() const {
+unsigned net::count() const {
     return count(side);
 }
 
 // Both template instantiation or full specification make linking possible.
-template unsigned Net::count<true>() const;
-template unsigned Net::count<false>() const;
+template unsigned net::count<true>() const;
+template unsigned net::count<false>() const;
 
-unsigned Net::count(bool side) const {
+unsigned net::count(bool side) const {
     if (side) {
         return true_count();
     } else {
@@ -33,7 +33,7 @@ unsigned Net::count(bool side) const {
     }
 }
 
-void Net::inc_count(bool side) {
+void net::inc_count(bool side) {
     if (side) {
         ++true_count_;
     } else {
@@ -41,18 +41,18 @@ void Net::inc_count(bool side) {
     }
 }
 
-void Net::dec_count(bool side) {
+void net::dec_count(bool side) {
     inc_count(!side);
 }
 
-void Net::push_cell(unsigned cell) {
+void net::push_cell(unsigned cell) {
     cells_.push_back(cell);
 }
 
-const vector<unsigned>& Net::cells() const {
+const vector<unsigned>& net::cells() const {
     return cells_;
 }
 
-unsigned Net::size() const {
+unsigned net::size() const {
     return cells_.size();
 }

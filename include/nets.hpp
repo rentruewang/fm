@@ -2,9 +2,9 @@
 
 #include <vector>
 
-class Net {
+class net {
    public:
-    Net();
+    net();
 
     void set_true_count(unsigned u);
 

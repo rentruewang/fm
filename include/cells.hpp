@@ -2,9 +2,9 @@
 
 #include <vector>
 
-class Cell {
+class cell {
    public:
-    Cell();
+    cell();
 
     void flip();
 
@@ -18,12 +18,12 @@ class Cell {
     const std::vector<unsigned>& nets() const;
     unsigned size() const;
 
-    Cell& operator++() {
+    cell& operator++() {
         inc_gain();
         return *this;
     }
 
-    Cell& operator--() {
+    cell& operator--() {
         dec_gain();
         return *this;
     }

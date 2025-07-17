@@ -7,14 +7,14 @@
 int main(int argc, char const* argv[]) {
     assert(argc == 3);
 
-    FloorPlan fp;
+    floorplan fp;
 
     fp << argv[1];
 
-    Init* strat;
+    init_strategy* strat;
 
-    auto soph_init{SophInit{fp}};
-    auto naiv_init{NaiveInit{fp}};
+    auto soph_init{sophisticated_init{fp}};
+    auto naiv_init{naive_init{fp}};
 
     strat = &soph_init;
     strat = &naiv_init;

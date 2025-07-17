@@ -5,9 +5,9 @@ using namespace std;
 
 // Since net_map_ and cell_map_ are shared, can't use `unique_ptr` here.
 // https://stackoverflow.com/questions/73714773/no-matching-function-for-call-to-construct-at
-FloorPlan::FloorPlan() : net_map_({}), cell_map_({}) {}
+floorplan::floorplan() : net_map_({}), cell_map_({}) {}
 
-FloorPlan::FloorPlan(vector<shared_ptr<Net>>& n, vector<shared_ptr<Cell>>& c)
+floorplan::floorplan(vector<shared_ptr<net>>& n, vector<shared_ptr<cell>>& c)
     : net_map_(n),
       cell_map_(c),
       bucket_(),
@@ -15,44 +15,43 @@ FloorPlan::FloorPlan(vector<shared_ptr<Net>>& n, vector<shared_ptr<Cell>>& c)
       total_count_((unsigned)-1),
       tolerate_((unsigned)-1) {}
 
-FloorPlan::FloorPlan(vector<shared_ptr<Net>>&& n,
-                       vector<shared_ptr<Cell>>&& c)
+floorplan::floorplan(vector<shared_ptr<net>>&& n, vector<shared_ptr<cell>>&& c)
     : net_map_(std::move(n)),
       cell_map_(std::move(c)),
       balance_(0.),
       total_count_((unsigned)-1),
       tolerate_((unsigned)-1) {
-    bucket_ = Bucket(cell_map_);
+    bucket_ = bucket(cell_map_);
 }
 
-void FloorPlan::nmap(vector<shared_ptr<Net>>&& net_map) {
+void floorplan::nmap(vector<shared_ptr<net>>&& net_map) {
     this->net_map_ = std::move(net_map);
 }
 
-vector<shared_ptr<Net>>& FloorPlan::nmap() {
+vector<shared_ptr<net>>& floorplan::nmap() {
     return net_map_;
 }
 
-const vector<shared_ptr<Net>>& FloorPlan::nmap() const {
+const vector<shared_ptr<net>>& floorplan::nmap() const {
     return net_map_;
 }
 
-void FloorPlan::cmap(vector<shared_ptr<Cell>>&& cmap) {
+void floorplan::cmap(vector<shared_ptr<cell>>&& cmap) {
     this->cell_map_ = cmap;
 }
 
-vector<shared_ptr<Cell>>& FloorPlan::cmap() {
+vector<shared_ptr<cell>>& floorplan::cmap() {
     return cell_map_;
 }
 
-const vector<shared_ptr<Cell>>& FloorPlan::cmap() const {
+const vector<shared_ptr<cell>>& floorplan::cmap() const {
     return cell_map_;
 }
 
-double FloorPlan::balance() const {
+double floorplan::balance() const {
     return balance_;
 }
 
-unsigned FloorPlan::tolerate() const {
+unsigned floorplan::tolerate() const {
     return tolerate_;
 }

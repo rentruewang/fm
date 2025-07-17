@@ -6,14 +6,14 @@
 
 using namespace std;
 
-void FloorPlan::sort_net_list() {
+void floorplan::sort_net_list() {
     auto net_cmp = [](const auto n1, const auto n2) {
         return n1->size() < n2->size();
     };
     sort(net_map_.begin(), net_map_.end(), net_cmp);
 }
 
-unsigned NaiveInit::init(vector<shared_ptr<Cell>>& cells) const {
+unsigned naive_init::init(vector<shared_ptr<cell>>& cells) const {
     unsigned half = cells.size() / 2;
     for (unsigned idx = 0, cnt = 0; idx < cells.size(); ++idx, ++cnt) {
         cells[idx]->side(cnt < half);
@@ -21,7 +21,7 @@ unsigned NaiveInit::init(vector<shared_ptr<Cell>>& cells) const {
     return half;
 }
 
-unsigned SophInit::init(vector<shared_ptr<Cell>>& cells) const {
+unsigned sophisticated_init::init(vector<shared_ptr<cell>>& cells) const {
     unsigned too_much = (cells.size() >> 1) + tolerate();
 
     unsigned net_size = nets().size();
@@ -95,19 +95,19 @@ unsigned SophInit::init(vector<shared_ptr<Cell>>& cells) const {
     return count_true;
 }
 
-const vector<shared_ptr<Net>>& SophInit::nets() const {
+const vector<shared_ptr<net>>& sophisticated_init::nets() const {
     return fp_.nmap();
 }
-unsigned SophInit::tolerate() const {
+unsigned sophisticated_init::tolerate() const {
     return fp_.tolerate();
 }
 
-void FloorPlan::init_side(const Init& init) {
+void floorplan::init_side(const init_strategy& init) {
     sort_net_list();
     total_count_ = init.init(cell_map_);
 }
 
-void FloorPlan::init_gains() {
+void floorplan::init_gains() {
     vector<int> simulation = vector<int>(cell_map_.size(), 0);
 
     for (auto net : net_map_) {
@@ -148,6 +148,6 @@ void FloorPlan::init_gains() {
     }
 }
 
-void FloorPlan::init_bucket() {
-    bucket_ = Bucket(cell_map_);
+void floorplan::init_bucket() {
+    bucket_ = bucket(cell_map_);
 }

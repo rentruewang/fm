@@ -4,23 +4,23 @@
 
 using namespace std;
 
-Bucket::Bucket() : bucket_(map<int, unsigned_set>()) {}
+bucket::bucket() : bucket_(map<int, unsigned_set>()) {}
 
-Bucket::Bucket(const vector<shared_ptr<Cell>>& cmap)
+bucket::bucket(const vector<shared_ptr<cell>>& cmap)
     : bucket_(map<int, unsigned_set>()) {
     fill(cmap);
 }
 
-const map<int, unsigned_set>& Bucket::get() const {
+const map<int, unsigned_set>& bucket::get() const {
     return bucket_;
 }
 
-void Bucket::push(const unsigned name, const Cell& cell) {
+void bucket::push(const unsigned name, const cell& cell) {
     int gain = cell.gain();
     bucket_[gain].insert(name);
 }
 
-unsigned Bucket::pop() {
+unsigned bucket::pop() {
     auto& [gain, lst] = *bucket_.rbegin();
 
     auto begin = *lst.begin();
@@ -32,7 +32,7 @@ unsigned Bucket::pop() {
     return cell;
 }
 
-unsigned Bucket::size() const {
+unsigned bucket::size() const {
     unsigned count = 0;
     for (auto iter = bucket_.begin(); iter != bucket_.end(); ++iter) {
         const auto& [_, lst] = *iter;
@@ -41,7 +41,7 @@ unsigned Bucket::size() const {
     return count;
 }
 
-bool Bucket::contains(unsigned name) {
+bool bucket::contains(unsigned name) {
     for (auto iter = bucket_.begin(); iter != bucket_.end(); ++iter) {
         const auto& [_, lst] = *iter;
         if (lst.contains(name)) {
@@ -51,7 +51,7 @@ bool Bucket::contains(unsigned name) {
     return false;
 }
 
-void Bucket::update(int old_gain, int new_gain, unsigned name) {
+void bucket::update(int old_gain, int new_gain, unsigned name) {
     auto& old_list = bucket_[old_gain];
 
     old_list.erase(name);
@@ -63,22 +63,22 @@ void Bucket::update(int old_gain, int new_gain, unsigned name) {
     new_list.insert(name);
 }
 
-void Bucket::update(gain_delta gain, unsigned name) {
+void bucket::update(gain_delta gain, unsigned name) {
     return update(gain.original, gain.updated, name);
 }
 
-void Bucket::fill(const vector<shared_ptr<Cell>>& cmap) {
+void bucket::fill(const vector<shared_ptr<cell>>& cmap) {
     for (unsigned idx = 0; idx < cmap.size(); ++idx) {
         push(idx, *cmap[idx]);
     }
 }
 
-Bucket& Bucket::operator=(Bucket&& b) {
+bucket& bucket::operator=(bucket&& b) {
     bucket_ = std::move(b.bucket_);
     return *this;
 }
 
-void Bucket::empty(Bucket& other, unordered_set<unsigned>& seen) {
+void bucket::empty(bucket& other, unordered_set<unsigned>& seen) {
     for (auto iter = other.bucket_.begin(); iter != other.bucket_.end();
          ++iter) {
         auto& [gain, lst] = *iter;
